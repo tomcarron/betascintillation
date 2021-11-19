@@ -140,20 +140,69 @@ Not sure if the above model2 is correct, this peak may be IC electrons rather th
 '''
 Finally we can make some plots :)
 '''
+
+plt.figure(0)
+plt.plot(Bi_closed[0],Bi_closed[1])
+plt.xlabel('Channel')
+plt.ylabel('Counts')
+plt.title('Bi-207, closed')
+plt.savefig('../plots/Bi_closed.png',dpi=400,bbox_inches='tight')
+
 plt.figure(1)
+plt.plot(Bi_open[0],Bi_open[1])
+plt.xlabel('Channel')
+plt.ylabel('Counts')
+plt.title('Bi-207, open')
+plt.savefig('../plots/Bi_open.png',dpi=400,bbox_inches='tight')
+
+plt.figure(2)
+plt.plot(Bi_mod[0],Bi_mod[1])
+plt.xlabel('Channel')
+plt.ylabel('Counts')
+plt.title('Bi-207 spectrum')
+plt.savefig('../plots/Bi.png',dpi=400,bbox_inches='tight')
+
+plt.figure(3)
+plt.plot(Energy,Bi_mod[1])
+plt.title('Bi-207 spectrum')
+plt.xlabel('Energy (keV)')
+plt.ylabel('Counts')
+plt.savefig('../plots/Bi_energy.png',dpi=400,bbox_inches='tight')
+
+plt.figure(4)
+plt.plot(Cs_open[0],Cs_open[1])
+plt.title('Cs-137 spectrum, open')
+plt.xlabel('Channel')
+plt.ylabel('Counts')
+plt.xlim(0,4000)
+plt.savefig('../plots/Cs_open.png',dpi=400,bbox_inches='tight')
+
+
+plt.figure(5)
+plt.plot(Cs_closed[0],Cs_closed[1])
+plt.title('Cs-137 spectrum, closed')
+plt.xlabel('Channel')
+plt.ylabel('Counts')
+plt.xlim(0,4000)
+plt.savefig('../plots/Cs_closed.png',dpi=400,bbox_inches='tight')
+
+plt.figure(6)
+plt.plot(Cs_mod[0],Cs_mod[1])
+plt.title('Cs-137 spectrum')
+plt.xlabel('Channel')
+plt.xlim(0,4000)
+plt.ylabel('Counts')
+plt.savefig('../plots/Cs.png',dpi=400,bbox_inches='tight')
+
+plt.figure(7)
 plt.plot(Energy,Cs_mod[1])
 plt.title('Cs-137 spectrum')
 plt.xlabel('Energy (keV)')
-#plt.xlim(73,1000)
+plt.xlim(0,1000)
 plt.ylabel('Counts')
+plt.savefig('../plots/Cs_energy.png',dpi=400,bbox_inches='tight')
 
-plt.figure(2)
-plt.plot(rel_eng(Energy),spectral_intensity_distribution(Energy,Cs_mod[1]))
-plt.xlabel('$\epsilon$')
-plt.ylabel('K($\epsilon$)')
-plt.xlim(1.15,3)
-plt.title('Kurie plot for Cs-137')
-plt.savefig('Kurie_Cs137.png',dpi=400,bbox_inches='tight')
+
 
 '''
 Calculating error for three points at indices a,b,c=600,1000,1400
@@ -168,13 +217,22 @@ b_errory=kappa_error(epsilon_error(delta_e),fermi_error,rel_eng(Energy)[b],Cs_mo
 c_errorx=epsilon_error(delta_e)
 c_errory=kappa_error(epsilon_error(delta_e),fermi_error,rel_eng(Energy)[c],Cs_mod[1][c],fermi_fit(rel_eng(Energy)[c],popt[0],popt[1],popt[2]))
 
+plt.figure(8)
+plt.plot(rel_eng(Energy),spectral_intensity_distribution(Energy,Cs_mod[1]))
+plt.errorbar(rel_eng(Energy[a]),spectral_intensity_distribution(Energy[a],Cs_mod[1][a]),a_errory,a_errorx,fmt='o',capsize=5.0,ms=3.0)
+plt.errorbar(rel_eng(Energy[b]),spectral_intensity_distribution(Energy[b],Cs_mod[1][b]),b_errory,b_errorx,fmt='o',capsize=5.0,ms=3.0)
+plt.errorbar(rel_eng(Energy[c]),spectral_intensity_distribution(Energy[c],Cs_mod[1][c]),c_errory,c_errorx,fmt='o',capsize=5.0,ms=3.0)
+plt.xlabel('$\epsilon$')
+plt.ylabel('K($\epsilon$)')
+plt.xlim(1.15,3)
+plt.title('Kurie plot for Cs-137')
+plt.savefig('../plots/Cs_Kurie.png',dpi=400,bbox_inches='tight')
 
 
-
-plt.figure(3)
+plt.figure(9)
 plt.scatter(rel_eng(Energy)[400:1600],spectral_intensity_distribution(Energy,Cs_mod[1])[400:1600],s=0.1)
 #plt.scatter(rel_eng(Energy)[2400:2600],spectral_intensity_distribution(Energy,Cs_mod[1])[2400:2600],s=0.1)
-plt.plot(rel_eng(Energy),y1,'--',label='First transition')
+plt.plot(rel_eng(Energy),y1,'--',label='Linear fit')
 #plt.plot(rel_eng(Energy),y2,'--',label='Second transition')
 plt.errorbar(rel_eng(Energy[a]),spectral_intensity_distribution(Energy[a],Cs_mod[1][a]),a_errory,a_errorx,fmt='o',capsize=5.0,ms=3.0)
 plt.errorbar(rel_eng(Energy[b]),spectral_intensity_distribution(Energy[b],Cs_mod[1][b]),b_errory,b_errorx,fmt='o',capsize=5.0,ms=3.0)
@@ -184,8 +242,8 @@ plt.xlabel('$\epsilon$')
 plt.ylabel('K($\epsilon$)')
 plt.xlim(1.15,2.25)
 plt.ylim(0,10)
-plt.title('Kurie plot for Cs-137, first transition.')
-plt.savefig('Kurie_Cs137_transition1.png',dpi=400,bbox_inches='tight')
+plt.title('Kurie plot for Cs-137.')
+plt.savefig('../plots/Kurie_Cs137_fit.png',dpi=400,bbox_inches='tight')
 '''
 plt.figure(4)
 plt.plot(rel_momentum(Energy),k_momentum(rel_momentum(Energy),Cs_mod[1]))
@@ -217,12 +275,12 @@ new_energy=np.linspace(0,max_energy_positive,1000)
 new_y=model1[0]*new_energy+model1[1]
 kurie_extrapolation=np.array([new_energy,new_y])
 
-plt.figure(5)
+plt.figure(10)
 plt.plot(e_from_rel_e(kurie_extrapolation[0]),counts_from_k(kurie_extrapolation[0],kurie_extrapolation[1]))
 plt.xlabel('Energy (keV)')
 plt.ylabel('Counts')
-plt.title('Spectrum of Cs-137, extrapolated from Kurie plot of first transition')
-plt.savefig('Extrapolated_spectrum.png',dpi=400,bbox_inches='tight')
+plt.title('Extrapolated Energy spectrum of Cs-137')
+plt.savefig('../plots/Extrapolated_spectrum.png',dpi=400,bbox_inches='tight')
 
 '''
 Not sure if above plot is correct - Should it look like the fermi corrected spectrum??
