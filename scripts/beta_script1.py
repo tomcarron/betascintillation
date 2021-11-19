@@ -70,7 +70,7 @@ def rel_eng(Energy):
 
 def spectral_intensity_distribution(Energy,counts):
 	E=rel_eng(Energy)
-	y=np.sqrt((counts) / (E*np.sqrt(((E**2)-1))*fermi_fit(E,popt[0],popt[1],popt[2])))
+	y=np.sqrt((counts) / (E*np.sqrt(((E**2)-1))*fermi_fit(Energy,popt[0],popt[1],popt[2])))
 	return y
 
 def rel_momentum(energy):
@@ -93,8 +93,9 @@ def counts_from_k(rel_energy,k):
     return counts
 
 def counts_from_k_momentum(momentum,k):
-    mom=rel_momentum(momentum)
-    counts=(k**2)*(fermi_fit(momentum,popt_momentum[0],popt_momentum[1],popt_momentum[2]))*(momentum**2)
+   # mom=rel_momentum(momentum)
+    mom=momentum
+    counts=(k**2)*(fermi_fit(mom,popt_momentum[0],popt_momentum[1],popt_momentum[2]))*(mom**2)
     return counts
 
 def e_from_rel_e(rel_energy):
@@ -261,7 +262,7 @@ plt.legend()
 plt.xlabel('$\epsilon$')
 plt.ylabel('K($\epsilon$)')
 plt.xlim(1.15,2.25)
-plt.ylim(0,10)
+plt.ylim(0,35)
 plt.title('Kurie plot for Cs-137.')
 plt.savefig('../plots/Kurie_Cs137_fit.png',dpi=400,bbox_inches='tight')
 '''
@@ -309,6 +310,7 @@ Extrapolated_Cs_df.to_csv('Extrapolated_spectrum_Cs.csv')
 Not sure if above plot is correct - Should it look like the fermi corrected spectrum??
 Also should produce a momentum spectrum here too.
 '''
+'''
 ymom=model1[0]*rel_momentum(Energy)+model1[1]
 mom_positive=[]
 for i in range(len(rel_momentum(Energy))):
@@ -320,9 +322,9 @@ extrap_mom_counts=model1[0]*new_momentum+model1[1]
 kurie_momentum_extrapolation=np.array([new_momentum,extrap_mom_counts])
 plt.figure(11)
 plt.plot(p_from_rel_p(kurie_momentum_extrapolation[0]),counts_from_k_momentum(kurie_momentum_extrapolation[0],kurie_momentum_extrapolation[1]))
-plt.xlabel('Momentum ')
+plt.xlabel('Momentum')
 plt.ylabel('Counts')
 plt.title('Extrapolated momentum spectrum of Cs-137')
 plt.savefig('../plots/Extrapolated_spectrum_momentum.png',dpi=400,bbox_inches='tight')
-
+'''
 plt.show()
