@@ -94,7 +94,7 @@ def counts_from_k(rel_energy,k):
 
 def counts_from_k_momentum(momentum,k):
     mom=rel_momentum(momentum)
-    counts=(k**2)*(fermi_fit(mom,popt_momentum[0],popt_momentum[1],popt_momentum[2]))*(momentum**2)
+    counts=(k**2)*(fermi_fit(momentum,popt_momentum[0],popt_momentum[1],popt_momentum[2]))*(momentum**2)
     return counts
 
 def e_from_rel_e(rel_energy):
@@ -106,6 +106,11 @@ def rel_p_from_rel_e(epsilon):
     return rel_p
 
 def p_from_rel_e(epsilon):
+    p=(0.51099895000*1000)*(np.sqrt(epsilon**2 -1)) #units of keV/c
+    return p
+
+def p_from_rel_p(rel_p):
+    epsilon=np.sqrt(rel_p**2 +1)
     p=(0.51099895000*1000)*(np.sqrt(epsilon**2 -1)) #units of keV/c
     return p
 #Error formulas derived using Gaussian error propagation.
@@ -304,12 +309,20 @@ Extrapolated_Cs_df.to_csv('Extrapolated_spectrum_Cs.csv')
 Not sure if above plot is correct - Should it look like the fermi corrected spectrum??
 Also should produce a momentum spectrum here too.
 '''
-'''
+ymom=model1[0]*rel_momentum(Energy)+model1[1]
+mom_positive=[]
+for i in range(len(rel_momentum(Energy))):
+                 if ymom[i] > 0.0:
+                     mom_positive.append(rel_momentum(Energy)[i])
+max_mom_positive=max(mom_positive)
+new_momentum=np.linspace(0,max_mom_positive,1000)
+extrap_mom_counts=model1[0]*new_momentum+model1[1]
+kurie_momentum_extrapolation=np.array([new_momentum,extrap_mom_counts])
 plt.figure(11)
-plt.plot()
+plt.plot(p_from_rel_p(kurie_momentum_extrapolation[0]),counts_from_k_momentum(kurie_momentum_extrapolation[0],kurie_momentum_extrapolation[1]))
 plt.xlabel('Momentum ')
 plt.ylabel('Counts')
 plt.title('Extrapolated momentum spectrum of Cs-137')
 plt.savefig('../plots/Extrapolated_spectrum_momentum.png',dpi=400,bbox_inches='tight')
-'''
+
 plt.show()
