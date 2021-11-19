@@ -51,7 +51,9 @@ array2=np.loadtxt('../Data/Cs_open',usecols=(1))[:-5]
 Cs_open=[array1,array2]
 
 Cs_mod=[Cs_open[0], Cs_open[1]-Cs_closed[1]]
-
+#Energy_data_array=np.array(Energy,Bi_mod[1],Cs_mod[1])
+Energy_data_df=pd.DataFrame({'Energy':Energy,'Bi_counts':Bi_mod[1],'Cs_counts':Cs_mod[1]})
+Energy_data_df.to_csv('Calibrated_data.csv')
 '''
 Import Fermi function values, plot function, find an appropriate fit
 '''
@@ -86,13 +88,26 @@ def fermi_fit(x,a0,a1,a2):
 	return y
 
 def counts_from_k(rel_energy,k):
-    counts=(k**2)*(fermi_fit(rel_energy,popt[0],popt[1],popt[2]))*(rel_energy)*(np.sqrt((rel_energy**2) -1))
+    E=e_from_rel_e(rel_energy)
+    counts=(k**2)*(fermi_fit(E,popt[0],popt[1],popt[2]))*(rel_energy)*(np.sqrt((rel_energy**2) -1))
+    return counts
+
+def counts_from_k_momentum(momentum,k):
+    mom=rel_momentum(momentum)
+    counts=(k**2)*(fermi_fit(mom,popt_momentum[0],popt_momentum[1],popt_momentum[2]))*(momentum**2)
     return counts
 
 def e_from_rel_e(rel_energy):
     energy=(rel_energy-1)*(0.51099895000*1000)  #in keV
     return energy
 
+def rel_p_from_rel_e(epsilon):
+    rel_p=np.sqrt(epsilon**2 -1)
+    return rel_p
+
+def p_from_rel_e(epsilon):
+    p=(0.51099895000*1000)*(np.sqrt(epsilon**2 -1)) #units of keV/c
+    return p
 #Error formulas derived using Gaussian error propagation.
 
 def epsilon_error(energy_error):
@@ -282,8 +297,19 @@ plt.ylabel('Counts')
 plt.title('Extrapolated Energy spectrum of Cs-137')
 plt.savefig('../plots/Extrapolated_spectrum.png',dpi=400,bbox_inches='tight')
 
+Extrapolated_Cs_df=pd.DataFrame({'Energy (keV)':e_from_rel_e(kurie_extrapolation[0]),'Counts':counts_from_k(kurie_extrapolation[0],kurie_extrapolation[1])})
+Extrapolated_Cs_df.to_csv('Extrapolated_spectrum_Cs.csv')
+
 '''
 Not sure if above plot is correct - Should it look like the fermi corrected spectrum??
 Also should produce a momentum spectrum here too.
+'''
+'''
+plt.figure(11)
+plt.plot()
+plt.xlabel('Momentum ')
+plt.ylabel('Counts')
+plt.title('Extrapolated momentum spectrum of Cs-137')
+plt.savefig('../plots/Extrapolated_spectrum_momentum.png',dpi=400,bbox_inches='tight')
 '''
 plt.show()
