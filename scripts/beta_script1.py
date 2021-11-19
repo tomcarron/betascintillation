@@ -93,6 +93,24 @@ def e_from_rel_e(rel_energy):
     energy=(rel_energy-1)*(0.51099895000*1000)  #in keV
     return energy
 
+#Error formulas derived using Gaussian error propagation.
+
+def epsilon_error(energy_error):
+    epsilon_error=energy_error / (0.51099895000*1000)
+    return epsilon_error
+
+def kappa_error(epsilon_error,fermi_error,epsilon,N,F):
+    count_err=count_error(N)
+    N_partial=(0.5*(N**(-0.5))) * (np.sqrt((F*epsilon*np.sqrt(epsilon**2 -1))**-1))
+    E_partial=(-np.sqrt(N/F)) * (((epsilon**2 - 1)+ epsilon**2)/(2*(np.sqrt(epsilon**2 -1))*(epsilon*np.sqrt(epsilon**2 -1))))
+    F_partial=(-F**(-3/2)) * (np.sqrt(N/(epsilon*np.sqrt(epsilon**2 -1))))
+    kappa_error=np.sqrt((count_err**2)*(N_partial**2)+(epsilon_error**2)*(E_partial**2)+(fermi_error**2)*(F_partial**2))
+    return kappa_error
+
+def count_error(N):
+    error=np.sqrt(N)
+    return error
+
 '''
 Here we do a fit of the fermi function for energy and momentum to use in our calculations
 '''
@@ -137,11 +155,30 @@ plt.xlim(1.15,3)
 plt.title('Kurie plot for Cs-137')
 plt.savefig('Kurie_Cs137.png',dpi=400,bbox_inches='tight')
 
+'''
+Calculating error for three points at indices a,b,c=600,1000,1400
+'''
+delta_e=chan_step*2
+fermi_error=1e-1
+a,b,c=600,1000,1400
+a_errorx=epsilon_error(delta_e)
+a_errory=kappa_error(epsilon_error(delta_e),fermi_error,rel_eng(Energy)[a],Cs_mod[1][a],fermi_fit(rel_eng(Energy)[a],popt[0],popt[1],popt[2]))
+b_errorx=epsilon_error(delta_e)
+b_errory=kappa_error(epsilon_error(delta_e),fermi_error,rel_eng(Energy)[b],Cs_mod[1][b],fermi_fit(rel_eng(Energy)[b],popt[0],popt[1],popt[2]))
+c_errorx=epsilon_error(delta_e)
+c_errory=kappa_error(epsilon_error(delta_e),fermi_error,rel_eng(Energy)[c],Cs_mod[1][c],fermi_fit(rel_eng(Energy)[c],popt[0],popt[1],popt[2]))
+
+
+
+
 plt.figure(3)
 plt.scatter(rel_eng(Energy)[400:1600],spectral_intensity_distribution(Energy,Cs_mod[1])[400:1600],s=0.1)
 #plt.scatter(rel_eng(Energy)[2400:2600],spectral_intensity_distribution(Energy,Cs_mod[1])[2400:2600],s=0.1)
 plt.plot(rel_eng(Energy),y1,'--',label='First transition')
 #plt.plot(rel_eng(Energy),y2,'--',label='Second transition')
+plt.errorbar(rel_eng(Energy[a]),spectral_intensity_distribution(Energy[a],Cs_mod[1][a]),a_errory,a_errorx,fmt='o',capsize=5.0,ms=3.0)
+plt.errorbar(rel_eng(Energy[b]),spectral_intensity_distribution(Energy[b],Cs_mod[1][b]),b_errory,b_errorx,fmt='o',capsize=5.0,ms=3.0)
+plt.errorbar(rel_eng(Energy[c]),spectral_intensity_distribution(Energy[c],Cs_mod[1][c]),c_errory,c_errorx,fmt='o',capsize=5.0,ms=3.0)
 plt.legend()
 plt.xlabel('$\epsilon$')
 plt.ylabel('K($\epsilon$)')
