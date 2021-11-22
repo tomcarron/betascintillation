@@ -28,10 +28,12 @@ max_channel=np.argmax(Bi_mod[1])
 print(Bi_mod[0][max_channel])
 #max occurs at channel 3495, which corresponds to E=1063.66 keV. Channel 0 has 0 energy.
 #Therefore each channel step represents an increase of 1063.66 /3531 keV.
+Pb_BE=88.005
+Ba_BE=37.44    #Binding energies
 Bi_peak_chan=3531
 Cs_peak_chan=2292
-Bi_chan_estep=1063.66 / Bi_peak_chan   #keV
-Cs_chan_estep=661.7 / Cs_peak_chan
+Bi_chan_estep=(1063.66+Pb_BE)/ Bi_peak_chan   #keV
+Cs_chan_estep=(661.7+Ba_BE)/ Cs_peak_chan
 chan_step=(Bi_chan_estep+Cs_chan_estep)/2.0
 Energy=Bi_mod[0] * chan_step
 
